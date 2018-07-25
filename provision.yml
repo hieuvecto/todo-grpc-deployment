@@ -1,0 +1,51 @@
+---
+- hosts: apps
+  remote_user: vagrant
+  become: yes
+  become_method: sudo
+  vars:
+    php_fpm_pool_user: 'nginx'
+    php_fpm_pool_group: 'nginx'
+    php_webserver_daemon: 'nginx'
+    php_enable_php_fpm: true
+    php_version: '7.1'
+  roles: 
+    - app.ssl-install
+    - geerlingguy.nginx
+    - geerlingguy.repo-remi
+    - geerlingguy.php-versions
+    - geerlingguy.php
+    - geerlingguy.memcached
+  tasks:
+    - name: install extend package
+      yum:
+        name: 
+          - php-mysqli
+          - vim
+        state: latest
+    - name: change group of /var/lib/php/* to nginx
+      command: sudo chgrp nginx /var/lib/php/session
+    # - name: Add nginx user to vagrant group
+    #   user: 
+    #     name: nginx
+    #     group: vagrant
+    
+- hosts: db
+  remote_user: vagrant
+  become: yes
+  become_method: sudo
+  roles:
+    - geerlingguy.mysql
+  tasks:
+    - name: install extend package
+      yum:
+        name: 
+          - vim
+        state: latest
+
+    - name: Retrieve stuff from mysql
+      command: >
+        sudo mysql -u root --execute="GRANT ALL PRIVILEGES ON *.* TO vagrant@'%' IDENTIFIED BY 'vagrant';"
+
+    
+     

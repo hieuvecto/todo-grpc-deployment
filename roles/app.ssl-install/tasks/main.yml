@@ -1,0 +1,35 @@
+---
+- name: create folder openssl private
+  file:
+    path: /etc/ssl/private/
+    state: directory
+    mode: 755
+
+- name: Confirm ssl key file exists
+  stat: path=/etc/ssl/private/nginx-selfsigned.key
+  register: sslkey
+
+- name: Genrsa key encrypt aes256
+  command: sudo openssl genpkey -algorithm RSA -out /etc/ssl/private/key.key -aes-256-cbc -pkeyopt rsa_keygen_bits:2048 -pass pass:1234
+  when:
+    - not sslkey.stat.exists
+
+- name: Delete passphrase
+  command: openssl  rsa -in /etc/ssl/private/key.key -out /etc/ssl/private/key.pem -passin pass:1234
+  when:
+    - not sslkey.stat.exists
+
+- name: create a crs
+  command: sudo openssl req -new -sha256 -key /etc/ssl/private/key.pem -out /etc/ssl/private/csr.csr -subj '/C=JP/ST=Tokyo/L=Shibuya/CN=example.com'
+  when:
+    - not sslkey.stat.exists
+
+- name: create certificate pair with OpenSSL
+  command: sudo openssl x509 -req -sha256 -days 10000 -in /etc/ssl/private/csr.csr -signkey /etc/ssl/private/key.pem -out /etc/ssl/certs/nginx-selfsigned.crt
+  when:
+    - not sslkey.stat.exists
+
+- name: create a self-signed key pair with OpenSSL
+  command: sudo openssl rsa -in /etc/ssl/private/key.pem -out /etc/ssl/private/nginx-selfsigned.key
+  when:
+    - not sslkey.stat.exists

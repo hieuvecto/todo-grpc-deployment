@@ -1,0 +1,12 @@
+---
+- src: geerlingguy.nginx
+
+- src: geerlingguy.php
+
+- src: geerlingguy.repo-remi
+  
+- src: geerlingguy.mysql
+
+- src: geerlingguy.memcached
+
+- src: geerlingguy.php-versions

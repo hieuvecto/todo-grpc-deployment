@@ -1,0 +1,8 @@
+# vagrant runtime
+/.vagrant
+
+*.retry
+
+/app
+app/
+
