@@ -6,10 +6,17 @@
   tasks:
     - name: init yii advanced project
       command: php /home/vagrant/app/init --env=Development --overwrite=n
+      register: log
 
+    - name: Debug
+      debug: var=log.stdout_lines
+      
     - name: install composer vendors
-      command: composer install
+      command: /usr/local/bin/composer install -d /home/vagrant/app
+      register: log
 
+    - name: Debug
+      debug: var=log.stdout_lines
     
 
     

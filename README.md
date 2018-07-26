@@ -3,7 +3,6 @@
 ## requirements
 - Git
 - Vangrant
-- Ansible
 
 ## Steps
 
@@ -11,20 +10,20 @@
 2. In the project directory, run the following commands:
 
 ```bash
-# Install ansible roles
-ansible-galaxy install -r requirements.yml
+# Clone mock-project and alias it
+git clone https://github.com/hieuvecto/MockProject.git app
 
 # Create vagrant boxes (ci, apps, db)
 vagrant up
-
-# Clone mock-project and alias it
-git clone https://github.com/hieuvecto/MockProject.git app
 
 # After vagrant boxes created, ssh into ci box
 vagrant ssh ci
 
 # Run ansible provision
 cd ansible-playbook
+
+# Install ansible roles
+ansible-galaxy install -r requirements.yml
 
 # Provisioning to install package in apps and db boxes
 ansible-playbook provision.yml

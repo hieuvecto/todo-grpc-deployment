@@ -14,10 +14,12 @@
   roles: 
     - app.ssl-install
     - geerlingguy.nginx
+    - geerlingguy.git
     - geerlingguy.repo-remi
     - geerlingguy.php-versions
     - geerlingguy.php
     - geerlingguy.php-mysql
+    - geerlingguy.composer
     - geerlingguy.memcached
   tasks:
     - name: install extend package
@@ -32,7 +34,7 @@
     - name: change group of /var/lib/php/* to vagrant
       command: chgrp vagrant /var/lib/php/session
 
-    - name: Configure php-fpm
+    - name: Configure php-fpm unix socket
       lineinfile:
         dest: "{{ php_fpm_pool_conf_path }}"
         regexp: "{{ item.regexp }}"
@@ -46,6 +48,10 @@
         - regexp: "^listen.mode.?=.+$"
           line: "listen.mode = 0660"
 
+    - name: Restart service php-fpm, in all cases
+      service:
+        name: php-fpm
+        state: restarted
     
 - hosts: db
   remote_user: vagrant
