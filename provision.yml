@@ -4,31 +4,47 @@
   become: yes
   become_method: sudo
   vars:
-    php_fpm_pool_user: 'nginx'
-    php_fpm_pool_group: 'nginx'
-    php_webserver_daemon: 'nginx'
-    php_enable_php_fpm: true
     php_version: '7.1'
+    php_fpm_listen: "/var/run/php-fpm.sock"
+    php_fpm_pool_user: 'nginx'
+    php_fpm_pool_group: 'vagrant'
+    php_enable_php_fpm: true
+    php_enablerepo: "remi"
   roles: 
     - app.ssl-install
     - geerlingguy.nginx
     - geerlingguy.repo-remi
     - geerlingguy.php-versions
     - geerlingguy.php
+    - geerlingguy.php-mysql
     - geerlingguy.memcached
   tasks:
     - name: install extend package
       yum:
         name: 
-          - php-mysqli
           - vim
         state: latest
-    - name: change group of /var/lib/php/* to nginx
-      command: sudo chgrp nginx /var/lib/php/session
-    # - name: Add nginx user to vagrant group
-    #   user: 
-    #     name: nginx
-    #     group: vagrant
+    
+    - name: Add {{ nginx_user }} to vagrant group
+      command: usermod -a -G vagrant nginx
+
+    - name: change group of /var/lib/php/* to vagrant
+      command: chgrp vagrant /var/lib/php/session
+
+    - name: Configure php-fpm
+      lineinfile:
+        dest: "{{ php_fpm_pool_conf_path }}"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+      with_items:
+        - regexp: "^listen.owner.?=.+$"
+          line: "listen.owner = {{ nginx_user }}"
+        - regexp: "^listen.group.?=.+$"
+          line: "listen.group = vagrant"
+        - regexp: "^listen.mode.?=.+$"
+          line: "listen.mode = 0660"
+
     
 - hosts: db
   remote_user: vagrant

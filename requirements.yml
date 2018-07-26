@@ -10,3 +10,5 @@
 - src: geerlingguy.memcached
 
 - src: geerlingguy.php-versions
+
+- src: geerlingguy.php-mysql

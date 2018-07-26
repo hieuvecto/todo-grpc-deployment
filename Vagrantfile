@@ -1,6 +1,5 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-
 Vagrant.configure(2) do |config|
   
   # config.vm.box = "bento/centos-7.4"
@@ -8,7 +7,9 @@ Vagrant.configure(2) do |config|
 
   server_configs = [
     {"hostname" => "ci", "ip" => "192.168.33.25", "memory_size" => "1024", "execute_script" => true},
-    {"hostname" => "apps", "ip" => "192.168.33.26", "memory_size" => "1024", "execute_script" => false, "sync_apps_dir" => true},
+    {"hostname" => "apps", "ip" => "192.168.33.26", "memory_size" => "1024", "execute_script" => false, "sync_apps_dir" => true, 
+      "domain" => { "frontend" => 'app-frontend.com', "backend" => 'app-backend.com'}
+    },
     {"hostname" => "db", "ip" => "192.168.33.27", "memory_size" => "1024", "execute_script" => false, "execute_sql" => true},
   ]
 
@@ -26,11 +27,16 @@ Vagrant.configure(2) do |config|
       end
    
       server.vm.synced_folder '.', '/vagrant', disabled: true
+      
+      server.ssh.private_key_path = "ssh/insecure_private_key"
+      server.ssh.insert_key = false
+
       if server_config['sync_apps_dir'] then
-        server.vm.synced_folder './app', '/home/vagrant/app', owner: "vagrant", group: "vagrant", create: true, mount_options: ["dmode=777,fmode=777"]
-        server.vm.synced_folder './app', '/home/vagrant/app1', owner: "vagrant", group: "vagrant", create: true, mount_options: ["dmode=777,fmode=777"]
-        server.vm.synced_folder './app', '/home/vagrant/app2', owner: "vagrant", group: "vagrant", create: true, mount_options: ["dmode=777,fmode=777"]
-        server.vm.provision :shell, path: "Vagrant/change-permissions-for-nginx.sh"
+        server.vm.synced_folder './app', '/home/vagrant/app', owner: "vagrant", group: "vagrant", create: true, mount_options: ["dmode=770,fmode=770"]
+        server.vm.synced_folder './app', '/home/vagrant/app1', owner: "vagrant", group: "vagrant", create: true, mount_options: ["dmode=770,fmode=770"]
+        server.vm.synced_folder './app', '/home/vagrant/app2', owner: "vagrant", group: "vagrant", create: true, mount_options: ["dmode=770,fmode=770"]
+
+        server.vm.provision :shell, path: "Vagrant/apps-bootstrap.sh"
       end
       
       if server_config['execute_script'] then
@@ -43,8 +49,6 @@ Vagrant.configure(2) do |config|
         server.vm.synced_folder './SQL_scripts', '/home/vagrant/SQL_scripts', owner: "vagrant", group: "vagrant", create: true
       end
       
-      server.ssh.private_key_path = "ssh/insecure_private_key"
-      server.ssh.insert_key = false
     end
   end
 end

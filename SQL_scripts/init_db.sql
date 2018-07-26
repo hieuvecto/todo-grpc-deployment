@@ -1,6 +1,5 @@
 -- ****************** SqlDBM: MySQL ******************;
 -- ***************************************************;
-
 USE mockProject;
 
 DROP TABLE `Booking`;
@@ -21,22 +20,26 @@ DROP TABLE `Owner`;
 DROP TABLE `Admin`;
 
 
+DROP TABLE `AuthUser`;
+
+
+DROP TABLE `AuthOwner`;
 
 -- ************************************** `User`
 
 CREATE TABLE `User`
 (
-`id` INT NOT NULL AUTO_INCREMENT ,
-`username` VARCHAR(40) NOT NULL ,
-`email` VARCHAR(40) NOT NULL ,
-`password` VARCHAR(255) NOT NULL ,
-`phone` VARCHAR(13) NOT NULL ,
-`avatarUrl` TEXT ,
-`created_at` INT(11) NOT NULL ,
-`updated_at` INT(11) NOT NULL ,
+ `user_id`     INT NOT NULL AUTO_INCREMENT,
+ `email`       VARCHAR(40) NOT NULL ,
+ `password`    VARCHAR(255) NOT NULL ,
+ `phone`       VARCHAR(13) NOT NULL ,
+ `avatar_url`  TEXT ,
+ `user_status` INT NOT NULL DEFAULT '0',
+ `created_at`  INT(11) NOT NULL ,
+ `updated_at`  INT(11) NOT NULL ,
+ `auth_key`	   VARCHAR(255),
 
-PRIMARY KEY (`id`),
-UNIQUE KEY (`username`),
+PRIMARY KEY (`user_id`),
 UNIQUE KEY (`email`),
 UNIQUE KEY (`phone`)
 ) AUTO_INCREMENT=1;
@@ -49,17 +52,16 @@ UNIQUE KEY (`phone`)
 
 CREATE TABLE `Owner`
 (
-`id` INT NOT NULL AUTO_INCREMENT ,
-`username` VARCHAR(40) NOT NULL ,
-`email` VARCHAR(40) NOT NULL ,
-`password` VARCHAR(255) NOT NULL ,
-`phone` VARCHAR(13) NOT NULL ,
-`avatarUrl` TEXT ,
-`created_at` INT(11) NOT NULL ,
-`updated_at` INT(11) NOT NULL ,
+ `owner_id`   INT NOT NULL AUTO_INCREMENT ,
+ `email`      VARCHAR(40) NOT NULL ,
+ `password`   VARCHAR(255) NOT NULL ,
+ `phone`      VARCHAR(13) NOT NULL ,
+ `avatar_url` TEXT ,
+ `created_at` INT(11) NOT NULL ,
+ `updated_at` INT(11) NOT NULL ,
+ `auth_key`	  VARCHAR(255),
 
-PRIMARY KEY (`id`),
-UNIQUE KEY (`username`),
+PRIMARY KEY (`owner_id`),
 UNIQUE KEY (`email`),
 UNIQUE KEY (`phone`)
 ) AUTO_INCREMENT=1;
@@ -72,15 +74,54 @@ UNIQUE KEY (`phone`)
 
 CREATE TABLE `Admin`
 (
-`id` INT NOT NULL AUTO_INCREMENT ,
-`username` VARCHAR(40) NOT NULL ,
-`password` VARCHAR(255) NOT NULL ,
+ `admin_id` INT NOT NULL AUTO_INCREMENT ,
+ `username` VARCHAR(40) NOT NULL ,
+ `password` VARCHAR(255) NOT NULL ,
+ `auth_key`	   VARCHAR(255),
 
-PRIMARY KEY (`id`),
+PRIMARY KEY (`admin_id`),
 UNIQUE KEY (`username`)
 ) AUTO_INCREMENT=1;
 
 
+
+-- ************************************** `AuthUser`
+
+CREATE TABLE `AuthUser`
+(
+ `auth_id`          INT NOT NULL AUTO_INCREMENT,
+ `user_id`          INT NOT NULL ,
+ `source`      		VARCHAR(255) NOT NULL ,
+ `source_id`      	VARCHAR(255) NOT NULL ,
+ `created_at`       INT(11) NOT NULL ,
+ `updated_at`       INT(11) NOT NULL ,
+
+PRIMARY KEY (`auth_id`),
+UNIQUE KEY (`user_id`),
+KEY `fkIdx_135` (`user_id`),
+CONSTRAINT `FK_AuthUser_User` FOREIGN KEY `fkIdx_135` (`user_id`) REFERENCES `User` (`user_id`)
+) AUTO_INCREMENT=1;
+
+
+
+
+
+-- ************************************** `AuthOwner`
+
+CREATE TABLE `AuthOwner`
+(
+ `auth_id`          INT NOT NULL AUTO_INCREMENT,
+ `owner_id`         INT NOT NULL ,
+ `source`      		VARCHAR(255) NOT NULL ,
+ `source_id`      	VARCHAR(255) NOT NULL ,
+ `created_at`       INT(11) NOT NULL ,
+ `updated_at`       INT(11) NOT NULL ,
+
+PRIMARY KEY (`auth_id`),
+UNIQUE KEY (`owner_id`),
+KEY `fkIdx_140` (`owner_id`),
+CONSTRAINT `FK_AuthOwner_Owner` FOREIGN KEY `fkIdx_140` (`owner_id`) REFERENCES `Owner` (`owner_id`)
+) AUTO_INCREMENT=1;
 
 
 
@@ -88,21 +129,22 @@ UNIQUE KEY (`username`)
 
 CREATE TABLE `Pitch`
 (
-`id` INT NOT NULL AUTO_INCREMENT,
-`name` VARCHAR(45) NOT NULL ,
-`description` TEXT ,
-`ownerId` INT NOT NULL ,
-`city` VARCHAR(20) NOT NULL ,
-`district` VARCHAR(20) NOT NULL ,
-`street` VARCHAR(30) NOT NULL ,
-`apartmentNumber` INT NOT NULL ,
-`created_at` INT(11) NOT NULL ,
-`updated_at` INT(11) NOT NULL ,
+ `pitch_id`         INT NOT NULL AUTO_INCREMENT,
+ `name`             NVARCHAR(45) NOT NULL ,
+ `description`      TEXT ,
+ `owner_id`         INT NOT NULL ,
+ `city`             NVARCHAR(20) NOT NULL ,
+ `district`         NVARCHAR(20) NOT NULL ,
+ `address`           NVARCHAR(40) NOT NULL ,
+ `phone_number`     VARCHAR(13) NOT NULL ,
+ `avatar_url` 		TEXT ,
+ `created_at`       INT(11) NOT NULL ,
+ `updated_at`       INT(11) NOT NULL ,
 
-PRIMARY KEY (`id`),
+PRIMARY KEY (`pitch_id`),
 UNIQUE KEY (`name`),
-KEY `fkIdx_129` (`ownerId`),
-CONSTRAINT `FK_Pitch_Owner` FOREIGN KEY `fkIdx_129` (`ownerId`) REFERENCES `Owner` (`id`)
+KEY `fkIdx_129` (`owner_id`),
+CONSTRAINT `FK_Pitch_Owner` FOREIGN KEY `fkIdx_129` (`owner_id`) REFERENCES `Owner` (`owner_id`)
 ) AUTO_INCREMENT=1;
 
 
@@ -113,21 +155,23 @@ CONSTRAINT `FK_Pitch_Owner` FOREIGN KEY `fkIdx_129` (`ownerId`) REFERENCES `Owne
 
 CREATE TABLE `SubPitch`
 (
-`id` INT NOT NULL AUTO_INCREMENT,
-`name` VARCHAR(45) NOT NULL ,
-`description` TEXT ,
-`status` BINARY NOT NULL DEFAULT 1,
-`pitchId` INT NOT NULL ,
-`startTime` TIME NOT NULL ,
-`endTime` TIME NOT NULL ,
-`pricePerHour` INT NOT NULL ,
-`currency` CHAR(3) NOT NULL DEFAULT 'VND',
-`created_at` INT(11) NOT NULL ,
-`updated_at` INT(11) NOT NULL ,
+ `sub_pitch_id`   INT NOT NULL AUTO_INCREMENT,
+ `name`           NVARCHAR(45) NOT NULL ,
+ `description`    TEXT ,
+ `status`         BINARY NOT NULL DEFAULT 1,
+ `pitch_id`       INT NOT NULL ,
+ `start_time`     TIME NOT NULL ,
+ `end_time`       TIME NOT NULL ,
+ `price_per_hour` INT NOT NULL ,
+ `currency`       CHAR(3) NOT NULL DEFAULT 'VND',
+ `avatar_url`	  TEXT ,
+ `size`		  	  TINYINT NOT NULL DEFAULT 5,
+ `created_at`     INT(11) NOT NULL ,
+ `updated_at`     INT(11) NOT NULL ,
 
-PRIMARY KEY (`id`),
-KEY `fkIdx_146` (`pitchId`),
-CONSTRAINT `FK_SubPitch_Pitch` FOREIGN KEY `fkIdx_146` (`pitchId`) REFERENCES `Pitch` (`Id`)
+PRIMARY KEY (`sub_pitch_id`),
+KEY `fkIdx_146` (`pitch_id`),
+CONSTRAINT `FK_SubPitch_Pitch` FOREIGN KEY `fkIdx_146` (`pitch_id`) REFERENCES `Pitch` (`pitch_id`)
 ) AUTO_INCREMENT=1;
 
 
@@ -138,28 +182,24 @@ CONSTRAINT `FK_SubPitch_Pitch` FOREIGN KEY `fkIdx_146` (`pitchId`) REFERENCES `P
 
 CREATE TABLE `Booking`
 (
-`id` INT NOT NULL AUTO_INCREMENT,
-`userId` INT NOT NULL ,
-`subPitchId` INT NOT NULL ,
-`bookDay` DATE NOT NULL ,
-`startTime` TIME NOT NULL ,
-`endTime` TIME NOT NULL ,
-`message` TEXT ,
-`isVerified` BINARY NOT NULL DEFAULT 0,
-`created_at` INT(11) NOT NULL ,
-`updated_at` INT(11) NOT NULL ,
+ `booking_id`   INT NOT NULL AUTO_INCREMENT,
+ `user_id`      INT NOT NULL ,
+ `sub_pitch_id` INT NOT NULL ,
+ `book_day`     DATE NOT NULL ,
+ `start_time`   TIME NOT NULL ,
+ `end_time`     TIME NOT NULL ,
+ `message`      TEXT ,
+ `is_verified`  BINARY NOT NULL DEFAULT 0,
+ `total_price`	INT NOT NULL,
+ `created_at`   INT(11) NOT NULL ,
+ `updated_at`   INT(11) NOT NULL ,
 
-PRIMARY KEY (`id`),
-KEY `fkIdx_154` (`userId`),
-CONSTRAINT `FK_Booking_User` FOREIGN KEY `fkIdx_154` (`userId`) REFERENCES `User` (`id`),
-KEY `fkIdx_167` (`subPitchId`),
-CONSTRAINT `FK_Booking_SubPitch` FOREIGN KEY `fkIdx_167` (`subPitchId`) REFERENCES `SubPitch` (`id`)
+PRIMARY KEY (`booking_id`),
+KEY `fkIdx_154` (`user_id`),
+CONSTRAINT `FK_Booking_User` FOREIGN KEY `fkIdx_154` (`user_id`) REFERENCES `User` (`user_id`),
+KEY `fkIdx_167` (`sub_pitch_id`),
+CONSTRAINT `FK_Booking_SubPitch` FOREIGN KEY `fkIdx_167` (`sub_pitch_id`) REFERENCES `SubPitch` (`sub_pitch_id`)
 ) AUTO_INCREMENT=1;
-
-
-
-
-
 
 
 
