@@ -1,0 +1,16 @@
+---
+- hosts: apps
+  remote_user: vagrant
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: init yii advanced project
+      command: php /home/vagrant/app/init --env=Development --overwrite=n
+
+    - name: install composer vendors
+      command: composer install
+
+    
+
+    
+     

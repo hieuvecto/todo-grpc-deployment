@@ -12,7 +12,7 @@
 
 ```bash
 # Install ansible roles
-ansible-galaxy install -r requirement.yml
+ansible-galaxy install -r requirements.yml
 
 # Create vagrant boxes (ci, apps, db)
 vagrant up
@@ -28,6 +28,9 @@ cd ansible-playbook
 
 # Provisioning to install package in apps and db boxes
 ansible-playbook provision.yml
+
+# Init apps in apps box
+ansible-playbook init_apps.yml
 
 # Init database in db box
 ansible-playbook init_database.yml
