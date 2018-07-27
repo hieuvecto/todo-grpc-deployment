@@ -6,8 +6,17 @@
 
 ## Steps
 
-1. clone this project
-2. In the project directory, run the following commands:
+1. 
+
+```
+# clone this deployment
+git clone https://github.com/hieuvecto/deploy-mock-project.git
+
+# cd to the deployment directory
+cd deploy-mock-project
+```
+
+2. In its directory, run the following commands:
 
 ```bash
 # Clone mock-project and alias it
@@ -28,11 +37,8 @@ ansible-galaxy install -r requirements.yml
 # Provisioning to install package in apps and db boxes
 ansible-playbook provision.yml
 
-# Init apps in apps box
-ansible-playbook init_apps.yml
-
-# Init database in db box
-ansible-playbook init_database.yml
+# Init apps and db box
+ansible-playbook init.yml
 
 # Exit ci box
 exit

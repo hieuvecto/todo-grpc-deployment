@@ -18,6 +18,17 @@
     - name: Debug
       debug: var=log.stdout_lines
     
+- hosts: db
+  remote_user: vagrant
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Create Database
+      command: >
+        sudo mysql -u root --execute="CREATE DATABASE IF NOT EXISTS mockProject CHARACTER SET utf8 COLLATE utf8_general_ci;"
+    - name: Refresh and create Tables
+      command: >
+        sudo mysql -u root --execute="source SQL_scripts/init_db.sql; "
 
     
      
