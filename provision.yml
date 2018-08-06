@@ -1,5 +1,5 @@
 ---
-- name: Installed required packages and config apps
+- name: Install required packages and config apps
   hosts: apps
   tags: apps-packages
   remote_user: vagrant
@@ -7,7 +7,6 @@
   vars_files: 
     - vars/apps.yml
   roles: 
-    - app.ssl-install
     - geerlingguy.nginx
     - geerlingguy.git
     - geerlingguy.repo-remi
@@ -18,6 +17,18 @@
     - geerlingguy.memcached
   tasks:
     - include_tasks: "tasks/apps-config.yml"
+
+- name: Install and config nginx load balancer
+  hosts: nginx
+  tags: nginx-load-balancer
+  remote_user: vagrant
+  become: yes
+  roles: 
+    - app.ssl-install
+    - geerlingguy.nginx
+  tasks:
+    - include_tasks: "tasks/nginx-config.yml"
+
 
 - name: Installed required packages and create privileges on db master and db slaves
   hosts: db

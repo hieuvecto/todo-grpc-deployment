@@ -1,0 +1,6 @@
+---
+- name: install extend package
+  yum:
+    name: 
+      - vim
+    state: latest

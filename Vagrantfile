@@ -7,7 +7,9 @@ Vagrant.configure(2) do |config|
 
   server_configs = [
     {"hostname" => "ci", "ip" => "192.168.33.25", "memory_size" => "512", "execute_script" => true },
-    {"hostname" => "apps", "ip" => "192.168.33.26", "memory_size" => "512", "sync_apps_dir" => true },
+    {"hostname" => "nginx", "ip" => "192.168.33.26", "memory_size" => "512", "config-nginx" => true },
+    {"hostname" => "app1", "ip" => "192.168.33.29", "memory_size" => "512", "sync_apps_dir" => true },
+    {"hostname" => "app2", "ip" => "192.168.33.30", "memory_size" => "512", "sync_apps_dir" => true },
     {"hostname" => "db-master", "ip" => "192.168.33.27", "memory_size" => "512", "sync_db_dir" => true },
     {"hostname" => "db-slave", "ip" => "192.168.33.28", "memory_size" => "512", "sync_db_dir" => true },
   ]
@@ -30,11 +32,13 @@ Vagrant.configure(2) do |config|
       server.ssh.private_key_path = "ssh/insecure_private_key"
       server.ssh.insert_key = false
 
+      if server_config['config-nginx'] then
+        server.vm.provision :shell, path: "Vagrant/apps-bootstrap.sh"
+      end
+
       if server_config['sync_apps_dir'] then
         server.vm.synced_folder './app', '/home/vagrant/app', owner: "vagrant", group: "vagrant", create: true, mount_options: ["dmode=770,fmode=770"]
-        server.vm.synced_folder './app', '/home/vagrant/app1', owner: "vagrant", group: "vagrant", create: true, mount_options: ["dmode=770,fmode=770"]
-        server.vm.synced_folder './app', '/home/vagrant/app2', owner: "vagrant", group: "vagrant", create: true, mount_options: ["dmode=770,fmode=770"]
-
+    
         server.vm.provision :shell, path: "Vagrant/apps-bootstrap.sh"
       end
       
