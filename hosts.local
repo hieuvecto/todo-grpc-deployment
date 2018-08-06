@@ -1,0 +1,12 @@
+[apps]
+apps1 ansible_host=192.168.33.26
+
+[db-master]
+db-master1 ansible_host=192.168.33.27 
+
+[db-slaves]
+db-slave1 ansible_host=192.168.33.28
+
+[db]
+db-master1
+db-slave1

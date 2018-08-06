@@ -6,11 +6,10 @@ Vagrant.configure(2) do |config|
   # config.vm.box_version = "201802.02.0"
 
   server_configs = [
-    {"hostname" => "ci", "ip" => "192.168.33.25", "memory_size" => "1024", "execute_script" => true},
-    {"hostname" => "apps", "ip" => "192.168.33.26", "memory_size" => "1024", "execute_script" => false, "sync_apps_dir" => true, 
-      "domain" => { "frontend" => 'app-frontend.com', "backend" => 'app-backend.com'}
-    },
-    {"hostname" => "db", "ip" => "192.168.33.27", "memory_size" => "1024", "execute_script" => false, "execute_sql" => true},
+    {"hostname" => "ci", "ip" => "192.168.33.25", "memory_size" => "512", "execute_script" => true },
+    {"hostname" => "apps", "ip" => "192.168.33.26", "memory_size" => "512", "sync_apps_dir" => true },
+    {"hostname" => "db-master", "ip" => "192.168.33.27", "memory_size" => "512", "sync_db_dir" => true },
+    {"hostname" => "db-slave", "ip" => "192.168.33.28", "memory_size" => "512", "sync_db_dir" => true },
   ]
 
   server_configs.each do |server_config|
@@ -45,8 +44,9 @@ Vagrant.configure(2) do |config|
         server.vm.provision :shell, path: "Vagrant/bootstrap.sh"
       end
 
-      if server_config['execute_sql'] then
+      if server_config['sync_db_dir'] then
         server.vm.synced_folder './SQL_scripts', '/home/vagrant/SQL_scripts', owner: "vagrant", group: "vagrant", create: true
+        server.vm.synced_folder './ssh', '/home/vagrant/ssh', owner: "vagrant", group: "vagrant", create: true
       end
       
     end

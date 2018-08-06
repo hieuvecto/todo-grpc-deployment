@@ -1,0 +1,8 @@
+---
+ansible_ssh_user: vagrant 
+ansible_ssh_private_key_file: ~/.ssh/id_rsa
+
+db_name: "mockProject"
+master_user: "mysql"
+master_password: "mysql"
+slave_count_id: 2

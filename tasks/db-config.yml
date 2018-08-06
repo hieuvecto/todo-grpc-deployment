@@ -1,0 +1,14 @@
+---
+- name: install extend package
+  yum:
+    name: 
+      - vim
+    state: latest
+
+- name: Create Database
+  command: >
+    sudo mysql -u root --execute="CREATE DATABASE IF NOT EXISTS {{ db_name }} CHARACTER SET utf8 COLLATE utf8_general_ci;"
+
+- name: Grant privileges on mysql
+  command: >
+    sudo mysql -u root --execute="GRANT ALL PRIVILEGES ON *.* TO vagrant@'%' IDENTIFIED BY 'vagrant';"

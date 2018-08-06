@@ -1,8 +1,15 @@
 ---
+- hosts: db-master
+  remote_user: vagrant
+  become: yes
+  tasks:
+    - name: Init database
+      command: >
+        sudo mysql -u root --execute="source SQL_scripts/init_db.sql; "
+
 - hosts: apps
   remote_user: vagrant
   become: yes
-  become_method: sudo
   tasks:
     - name: init yii advanced project
       command: php /home/vagrant/app/init --env=Development --overwrite=n
@@ -17,18 +24,13 @@
 
     - name: Debug
       debug: var=log.stdout_lines
+
+    - name: excute init command
+      command: php /home/vagrant/app/yii init
+      register: log
     
-- hosts: db
-  remote_user: vagrant
-  become: yes
-  become_method: sudo
-  tasks:
-    - name: Create Database
-      command: >
-        sudo mysql -u root --execute="CREATE DATABASE IF NOT EXISTS mockProject CHARACTER SET utf8 COLLATE utf8_general_ci;"
-    - name: Refresh and create Tables
-      command: >
-        sudo mysql -u root --execute="source SQL_scripts/init_db.sql; "
+    - name: Debug
+      debug: var=log.stdout_lines
 
     
      

@@ -1,0 +1,31 @@
+---
+- name: install extend package
+  yum:
+    name: 
+      - vim
+    state: latest
+    
+- name: Add {{ nginx_user }} to vagrant group
+  command: usermod -a -G vagrant nginx
+
+- name: change group of /var/lib/php/* to vagrant
+  command: chgrp vagrant /var/lib/php/session
+
+- name: Configure php-fpm unix socket
+  lineinfile:
+    dest: "{{ php_fpm_pool_conf_path }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items:
+    - regexp: "^listen.owner.?=.+$"
+      line: "listen.owner = {{ nginx_user }}"
+    - regexp: "^listen.group.?=.+$"
+      line: "listen.group = vagrant"
+    - regexp: "^listen.mode.?=.+$"
+      line: "listen.mode = 0660"
+
+- name: Restart service php-fpm, in all cases
+  service:
+    name: php-fpm
+    state: restarted

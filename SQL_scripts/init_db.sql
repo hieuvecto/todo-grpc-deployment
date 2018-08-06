@@ -8,6 +8,12 @@ DROP TABLE `Booking`;
 DROP TABLE `SubPitch`;
 
 
+DROP TABLE `CampaignSubPitch`;
+
+
+DROP TABLE `Campaign`;
+
+
 DROP TABLE `Pitch`;
 
 
@@ -97,7 +103,6 @@ CREATE TABLE `AuthUser`
  `updated_at`       INT(11) NOT NULL ,
 
 PRIMARY KEY (`auth_id`),
-UNIQUE KEY (`user_id`),
 KEY `fkIdx_135` (`user_id`),
 CONSTRAINT `FK_AuthUser_User` FOREIGN KEY `fkIdx_135` (`user_id`) REFERENCES `User` (`user_id`)
 ) AUTO_INCREMENT=1;
@@ -118,7 +123,6 @@ CREATE TABLE `AuthOwner`
  `updated_at`       INT(11) NOT NULL ,
 
 PRIMARY KEY (`auth_id`),
-UNIQUE KEY (`owner_id`),
 KEY `fkIdx_140` (`owner_id`),
 CONSTRAINT `FK_AuthOwner_Owner` FOREIGN KEY `fkIdx_140` (`owner_id`) REFERENCES `Owner` (`owner_id`)
 ) AUTO_INCREMENT=1;
@@ -175,7 +179,44 @@ CONSTRAINT `FK_SubPitch_Pitch` FOREIGN KEY `fkIdx_146` (`pitch_id`) REFERENCES `
 ) AUTO_INCREMENT=1;
 
 
+-- ************************************** `Campaign`
 
+CREATE TABLE `Campaign`
+(
+ `campaign_id`      INT NOT NULL AUTO_INCREMENT,
+ `name`             NVARCHAR(45) NOT NULL ,
+ `description`      TEXT ,
+ `owner_id`         INT NOT NULL ,
+ `avatar_url` 		TEXT ,
+ `start_time`		DATETIME NOT NULL,
+ `end_time`			DATETIME NOT NULL,
+ `type`				TINYINT NOT NULL DEFAULT 0,
+ `value`			DOUBLE	NOT NULL,
+ `created_at`       INT(11) NOT NULL ,
+ `updated_at`       INT(11) NOT NULL ,
+
+PRIMARY KEY (`campaign_id`),
+KEY `fkIdx_160` (`owner_id`),
+CONSTRAINT `FK_Campaign_Owner` FOREIGN KEY `fkIdx_160` (`owner_id`) REFERENCES `Owner` (`owner_id`)
+) AUTO_INCREMENT=1;
+
+
+-- ************************************** `CampaignSubPitch`
+
+CREATE TABLE `CampaignSubPitch`
+(
+ `campaign_sub_pitch_id`      INT NOT NULL AUTO_INCREMENT,
+ `campaign_id`		INT NOT NULL,
+ `sub_pitch_id`		INT NOT NULL,
+ `created_at`       INT(11) NOT NULL ,
+ `updated_at`       INT(11) NOT NULL ,
+
+PRIMARY KEY (`campaign_sub_pitch_id`),
+KEY `fkIdx_170` (`campaign_id`),
+KEY `fkIdx_171` (`sub_pitch_id`),
+CONSTRAINT `FK_CampaignSubPitch_Campaign` FOREIGN KEY `fkIdx_170` (`campaign_id`) REFERENCES `Campaign` (`campaign_id`),
+CONSTRAINT `FK_CampaignSubPitch_SubPitch` FOREIGN KEY `fkIdx_171` (`sub_pitch_id`) REFERENCES `SubPitch` (`sub_pitch_id`)
+) AUTO_INCREMENT=1;
 
 
 -- ************************************** `Booking`
@@ -190,6 +231,7 @@ CREATE TABLE `Booking`
  `end_time`     TIME NOT NULL ,
  `message`      TEXT ,
  `is_verified`  BINARY NOT NULL DEFAULT 0,
+ `is_paid`		BINARY NOT NULL DEFAULT 0,
  `total_price`	INT NOT NULL,
  `created_at`   INT(11) NOT NULL ,
  `updated_at`   INT(11) NOT NULL ,
