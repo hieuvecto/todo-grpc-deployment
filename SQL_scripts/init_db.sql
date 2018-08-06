@@ -233,6 +233,7 @@ CREATE TABLE `Booking`
  `is_verified`  BINARY NOT NULL DEFAULT 0,
  `is_paid`		BINARY NOT NULL DEFAULT 0,
  `total_price`	INT NOT NULL,
+ `additional_info` TEXT ,
  `created_at`   INT(11) NOT NULL ,
  `updated_at`   INT(11) NOT NULL ,
 
