@@ -1,0 +1,14 @@
+---
+- name: Deploy grpc-server
+  hosts: 
+    - grpc-server
+  remote_user: vagrant
+  roles: 
+    - app.deploy-grpc-server
+
+- name: Deploy client
+  hosts: 
+    - client
+  remote_user: vagrant
+  roles: 
+    - app.deploy-client

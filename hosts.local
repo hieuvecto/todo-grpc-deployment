@@ -1,16 +1,5 @@
-[nginx]
-nginx1 ansible_host=192.168.33.26
+[client]
+192.168.33.26
 
-[apps]
-app1 ansible_host=192.168.33.29
-app2 ansible_host=192.168.33.30
-
-[db-master]
-db-master1 ansible_host=192.168.33.27 
-
-[db-slaves]
-db-slave1 ansible_host=192.168.33.28
-
-[db]
-db-master1
-db-slave1
+[grpc-server]
+192.168.33.27

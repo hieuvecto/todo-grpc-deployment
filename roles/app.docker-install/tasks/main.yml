@@ -1,0 +1,28 @@
+---
+- name: check docker exist
+  command: docker --version
+  register: exist_docker
+  ignore_errors: True
+
+- name: docker install
+  shell: curl https://releases.rancher.com/install-docker/"{{ docker_version }}".sh | sh
+  when: exist_docker is failed
+
+- name: reload daemon
+  command: systemctl daemon-reload
+  when: exist_docker is failed
+
+- name: add user to docker group
+  user: name={{ docker_user }}
+        groups=docker
+        append=yes
+  when: exist_docker is failed
+
+- name: systemctl restart docker
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+    name: docker
+    enabled: yes
+  when: exist_docker is failed

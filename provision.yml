@@ -1,60 +1,10 @@
 ---
-- name: Install required packages and config apps
-  hosts: apps
-  tags: apps-packages
+- name: Install required packages
+  hosts: 
+    - client
+    - grpc-server
   remote_user: vagrant
-  become: yes
-  vars_files: 
-    - vars/apps.yml
   roles: 
-    - geerlingguy.nginx
-    - geerlingguy.git
-    - geerlingguy.repo-remi
-    - geerlingguy.php-versions
-    - geerlingguy.php
-    - geerlingguy.php-mysql
-    - geerlingguy.composer
-    - geerlingguy.memcached
-  tasks:
-    - include_tasks: "tasks/apps-config.yml"
-
-- name: Install and config nginx load balancer
-  hosts: nginx
-  tags: nginx-load-balancer
-  remote_user: vagrant
-  become: yes
-  roles: 
-    - app.ssl-install
-    - geerlingguy.nginx
-  tasks:
-    - include_tasks: "tasks/nginx-config.yml"
-
-
-- name: Installed required packages and create privileges on db master and db slaves
-  hosts: db
-  tags: database-packages
-  remote_user: vagrant
-  become: yes
-  roles:
-    - geerlingguy.mysql
-  tasks:
-    - include_tasks: "tasks/db-config.yml"
-
-- name: config db master
-  hosts: db-master
-  remote_user: vagrant
-  become: yes
-  tags: config-master
-  tasks:
-    - include_tasks: "tasks/db-master-config.yml"
-
-- name: config db-slaves
-  hosts: db-slaves
-  tags: config-slaves
-  remote_user: vagrant
-  become: yes 
-  tasks:
-    - include_tasks: "tasks/db-slaves-config.yml"    
-
+    - app.docker-install
+    - app.docker-compose-install
     
-     

@@ -1,9 +1,0 @@
----
-mysql_root_username: root
-mysql_root_password: root
-mysql_root_password_update: yes
-
-db-name: "mockProject"
-master_user: "mysql"
-master_password: "mysql"
-slave_count_id: 2
