@@ -1,4 +1,4 @@
-# deploy-mock-project
+# deployment of todo-grpc
 
 ## requirements
 - Git
@@ -6,55 +6,46 @@
 
 ## Steps
 
-1. 
-
-```
-# clone this deployment
-git clone https://github.com/hieuvecto/deploy-mock-project.git
-
-# cd to the deployment directory
-cd deploy-mock-project
-```
-
-2. In its directory, run the following commands:
+### 1. 
 
 ```bash
-# Clone mock-project and alias it
-git clone https://github.com/hieuvecto/MockProject.git app
+# clone this deployment
+git clone https://github.com/hieuvecto/todo-grpc-deployment.git
 
-# Create vagrant boxes (ci, apps, db)
+# cd to the deployment directory
+cd todo-grpc-deployment
+```
+
+### 2. In its directory, run the following commands:
+
+```bash
+# Clone todo-grpc and alias it
+git clone https://github.com/hieuvecto/todo-grpc.git app
+
+# Create vagrant boxes (ci, client, grpc-server)
 vagrant up
 
 # After vagrant boxes created, ssh into ci box
 vagrant ssh ci
 
-# Run ansible provision
+# cd into ansible provision
 cd ansible-playbook
 
-# Install ansible roles
-ansible-galaxy install -r requirements.yml
+# Provisioning to install packages in client and grpc server 
+ansible-playbook -i hosts.local provision.yml --become
 
-# Provisioning to install package in apps and db boxes
-ansible-playbook provision.yml
-
-# Init apps and db box
-ansible-playbook init.yml
-
-# Exit ci box
-exit
-```
-
-3. Insert the following lines into /etc/hosts file to support social authentication (optional)
+# Deploy both client and grpc server
+ansible-playbook -i hosts.local deploy.yml --become
 
 ```
-192.168.33.26 app-frontend.com
-192.168.33.26 app-backend.com
-```
-4. That's it. Navigate the following urls to see my mock project
 
-```
-# If you skipped step 3
-https://192.168.33.26
+### 3. Wait until all of the containers are ready (around 2 minutes for building go codes, 1 minute for initting mysql) 
 
-# If you did step 3
-https://app-frontend.com
+navigate 192.168.33.26:8080 to see the web app (client)
+
+### 4. If one of the containers was down, you could re-deploy them
+
+```bash
+# Deploy both client and grpc server
+ansible-playbook -i hosts.local deploy.yml --become
+```
